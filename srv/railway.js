@@ -1,5 +1,8 @@
 const cds = require('@sap/cds');
-const { create } = require('xmlbuilder2');
+//const { create } = require('xmlbuilder2');
+
+const json2xml = require('json2xml');
+
 const axios = require('axios');
 module.exports = cds.service.impl(async function () {
 const {railway}=this.entities
@@ -13,17 +16,28 @@ const {railway}=this.entities
         }
 
         console.log("Row data:", rowData);
-        const xmlData = create({ version: '1.0', encoding: 'UTF-8' })
-            .ele('railway')  // Root element
-            .ele('ID').txt(rowData.ID).up()
-            .ele('pnr_no').txt(rowData.pnr_no).up()
-            .ele('trn').txt(rowData.trn).up()
-            .ele('from_add').txt(rowData.from_add).up()
-            .ele('to_add').txt(rowData.to_add).up()
-            .ele('berth_selected').txt(rowData.berth_selected).up()
-            .ele('doj').txt(rowData.doj).up()
-            .ele('class').txt(rowData.classs).up()
-            .end({ prettyPrint: true });  
+
+
+const convertRowDataToXML = (rowData) => {
+   
+    const xmlData = json2xml({ railway: rowData }, { header: true });
+    return xmlData;
+};
+
+const xmlData = convertRowDataToXML(rowData);
+
+
+        // const xmlData = create({ version: '1.0', encoding: 'UTF-8' })
+        //     .ele('railway')  // Root element
+        //     .ele('ID').txt(rowData.ID).up()
+        //     .ele('pnr_no').txt(rowData.pnr_no).up()
+        //     .ele('trn').txt(rowData.trn).up()
+        //     .ele('from_add').txt(rowData.from_add).up()
+        //     .ele('to_add').txt(rowData.to_add).up()
+        //     .ele('berth_selected').txt(rowData.berth_selected).up()
+        //     .ele('doj').txt(rowData.doj).up()
+        //     .ele('class').txt(rowData.classs).up()
+        //     .end({ prettyPrint: true });  
         console.log("Generated XML:", xmlData);
         const base64EncodedXML = Buffer.from(xmlData).toString('base64');
 
